@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Dispensação de Insulina</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary: #007bff;
+            --primary-hover: #0056b3;
+            --text-main: #333333;
+            --border-color: #cccccc;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #222;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .medicacao-row {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .select-insulina {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-weight: bold;
+            background-color: #fff;
+        }
+
+        .turnos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-remove:hover {
+            background: #bd2130;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button.btn-main {
+            flex: 1;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-add:hover { background-color: #5a6268; }
+
+        .btn-calc {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-calc:hover { background-color: var(--primary-hover); }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e9ecef;
+            border-left: 5px solid var(--primary);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .result-box h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculadora de Canetas de Insulina</h2>
+    <p class="subtitle">Insira as doses por turno. Campos vazios serão considerados como zero (0).</p>
+
+    <div id="medicacoes-container">
+        <!-- Primeira linha padrão -->
+        <div class="medicacao-row">
+            <div class="row-header">
+                <select class="select-insulina">
+                    <option value="NPH">NPH</option>
+                    <option value="Regular">Regular</option>
+                </select>
+                <button class="btn-remove" onclick="removerLinha(this)" style="display:none;">Remover</button>
+            </div>
+            <div class="turnos-grid">
+                <div class="input-group">
+                    <label>Manhã (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Tarde (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Noite (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <button class="btn-main btn-add" onclick="adicionarLinha()">+ Adicionar Insulina</button>
+        <button class="btn-main btn-calc" onclick="calcularDispensacao()">Calcular Canetas</button>
+    </div>
+
+    <div id="resultado" class="result-box"></div>
+</div>
+
+<script>
+    // Função para adicionar um novo tipo de insulina na tela
+    function adicionarLinha() {
+        const container = document.getElementById('medicacoes-container');
+        const novaLinha = document.createElement('div');
+        novaLinha.className = 'medicacao-row';
+        novaLinha.innerHTML = `
+            <div class="row-header">
+                <select class="select-insulina">
+                    <option value="NPH">NPH</option>
+                    <option value="Regular">Regular</option>
+                </select>
+                <button class="btn-remove" onclick="removerLinha(this)">Remover</button>
+            </div>
+            <div class="turnos-grid">
+                <div class="input-group">
+                    <label>Manhã (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Tarde (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Noite (UI)</label>
+                    <input type="number" class="turno-input" min="0" placeholder="0">
+                </div>
+            </div>
+        `;
+        container.appendChild(novaLinha);
+        atualizarBotoesRemover();
+    }
+
+    function removerLinha(botao) {
+        botao.closest('.medicacao-row').remove();
+        atualizarBotoesRemover();
+    }
+
+    function atualizarBotoesRemover() {
+        const linhas = document.querySelectorAll('.medicacao-row');
+        const botoes = document.querySelectorAll('.btn-remove');
+        // Se só tiver uma linha, esconde o botão remover dela
+        if (linhas.length === 1) {
+            botoes[0].style.display = 'none';
+        } else {
+            botoes.forEach(b => b.style.display = 'block');
+        }
+    }
+
+    // Retorna o número exato de canetas com base na sua tabela de referência
+    function obterQuantidadeCanetas(totalDiario) {
+        if (totalDiario <= 0) return 0;
+        // A lógica da sua tabela segue exatamente o teto da divisão por 10
+        // Ex: 1 a 10 = 1 | 11 a 20 = 2 | 21 a 30 = 3...
+        return Math.ceil(totalDiario / 10);
+    }
+
+    function calcularDispensacao() {
+        const linhas = document.querySelectorAll('.medicacao-row');
+        const resumo = {};
+
+        linhas.forEach(linha => {
+            const tipo = linha.querySelector('.select-insulina').value;
+            const inputs = linha.querySelectorAll('.turno-input');
+            
+            let somaLinha = 0;
+            inputs.forEach(input => {
+                const valor = parseFloat(input.value) || 0;
+                somaLinha += valor;
+            });
+
+            // Se o usuário adicionar o mesmo tipo mais de uma vez, acumula os valores
+            if (resumo[tipo]) {
+                resumo[tipo] += somaLinha;
+            } else {
+                resumo[tipo] = somaLinha;
+            }
+        });
+
+        const resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML = '<h3>📋 Resultado do Cálculo</h3>';
+        
+        let temDados = false;
+
+        for (const [tipo, totalDiario] of Object.entries(resumo)) {
+            if (totalDiario > 0) {
+                temDados = true;
+                const canetas = obterQuantidadeCanetas(totalDiario);
+                
+                resultadoDiv.innerHTML += `
+                    <div class="result-item">
+                        <strong>Insulina ${tipo}:</strong><br>
+                        Total Diário: ${totalDiario} UI<br>
+                        Quantidade de Canetas: <strong>${canetas} caneta(s)</strong>
+                    </div>
+                `;
+            }
+        }
+
+        if (!temDados) {
+            resultadoDiv.innerHTML += '<p style="color:#dc3545; margin:0;">Por favor, insira pelo menos um valor maior que zero.</p>';
+        }
+
+        resultadoDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

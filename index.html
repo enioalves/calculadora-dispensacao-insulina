@@ -12,6 +12,8 @@
             --text-main: #333333;
             --border-color: #cccccc;
             --bg-readonly: #e9ecef;
+            --danger: #dc3545;
+            --danger-hover: #bd2130;
         }
 
         body {
@@ -105,6 +107,28 @@
             color: #28a745 !important;
         }
 
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .btn-clear {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: var(--danger-hover);
+        }
+
         /* Responsividade para telas de celulares */
         @media (max-width: 600px) {
             .calc-header {
@@ -130,6 +154,13 @@
                 margin-bottom: 3px;
                 font-weight: bold;
             }
+            .actions {
+                justify-content: center;
+            }
+            .btn-clear {
+                width: 100%;
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -137,7 +168,7 @@
 
 <div class="container">
     <h2>Calculadora de Insulina</h2>
-    <p class="subtitle">Digite as doses separadas por "+" (ex: 10+10+10) e pressione Enter.</p>
+    <p class="subtitle">Digite as doses (ex: 10+10+10). Pressione Enter para calcular e Enter novamente para mudar de linha.</p>
 
     <!-- Cabeçalho visível em computadores/tablets -->
     <div class="calc-header">
@@ -152,7 +183,7 @@
         <div class="label-insulina">NPH</div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" onchange="calcularLinha('nph')" onkeydown="checkEnter(event, 'nph')">
+            <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
         </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
@@ -169,7 +200,7 @@
         <div class="label-insulina">Regular</div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" onchange="calcularLinha('reg')" onkeydown="checkEnter(event, 'reg')">
+            <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" onkeydown="gerenciarEnter(event, 'reg', null)">
         </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
@@ -180,10 +211,16 @@
             <input type="text" class="output-field output-canetas" id="canetas-reg" readonly value="0">
         </div>
     </div>
+
+    <div class="actions">
+        <button class="btn-clear" onclick="limparTudo()">Limpar Campos</button>
+    </div>
 </div>
 
 <script>
-    // Gerencia a exibição de etiquetas auxiliares apenas se estiver visualizando no celular
+    // Armazena o estado para saber se o valor mudou desde o último cálculo
+    const ultimosValores = { nph: "", reg: "" };
+
     function ajustarLabelsMoveis() {
         const labels = document.querySelectorAll('.show-mobile-only');
         if (window.innerWidth <= 600) {
@@ -195,15 +232,32 @@
     window.addEventListener('resize', ajustarLabelsMoveis);
     window.addEventListener('DOMContentLoaded', ajustarLabelsMoveis);
 
-    function checkEnter(event, tipo) {
+    function gerenciarEnter(event, tipoAtual, proximoTipo) {
         if (event.key === 'Enter') {
-            calcularLinha(tipo);
+            event.preventDefault(); // Evita comportamentos indesejados do form
+            
+            const inputElement = document.getElementById(`input-${tipoAtual}`);
+            const valorAtual = inputElement.value.trim();
+
+            // Se o valor na caixa mudou em relação ao que foi calculado por último, calcula primeiro
+            if (valorAtual !== ultimosValores[tipoAtual]) {
+                calcularLinha(tipoAtual);
+                ultimosValores[tipoAtual] = valorAtual;
+            } else {
+                // Se o valor já estava calculado e ele apertou Enter de novo, pula para a próxima linha
+                if (proximoTipo) {
+                    document.getElementById(`input-${proximoTipo}`).focus();
+                } else {
+                    // Se for a última linha (Regular), tira o foco para fechar o teclado do celular
+                    inputElement.blur();
+                }
+            }
         }
     }
 
     function obterQuantidadeCanetas(totalDiario) {
         if (totalDiario <= 0) return 0;
-        return Math.ceil(totalDiario / 10); // Lógica exata da sua tabela de intervalos
+        return Math.ceil(totalDiario / 10);
     }
 
     function calcularLinha(tipo) {
@@ -217,7 +271,6 @@
             return;
         }
 
-        // Remove espaços em branco indesejados e divide os números usando o caractere "+"
         const partes = inputVal.replace(/\s+/g, '').split('+');
         let soma = 0;
 
@@ -234,6 +287,25 @@
 
         totalField.value = `${soma} UI`;
         canetasField.value = `${canetas} caneta${canetas !== 1 ? 's' : ''}`;
+    }
+
+    function limparTudo() {
+        // Limpa os inputs de texto
+        document.getElementById('input-nph').value = "";
+        document.getElementById('input-reg').value = "";
+        
+        // Zera as saídas de texto
+        document.getElementById('total-nph').value = "0 UI";
+        document.getElementById('canetas-nph').value = "0";
+        document.getElementById('total-reg').value = "0 UI";
+        document.getElementById('canetas-reg').value = "0";
+
+        // Limpa o histórico de verificação do Enter
+        ultimosValores.nph = "";
+        ultimosValores.reg = "";
+
+        // Devolve o foco para o primeiro campo (NPH) para agilizar o próximo uso
+        document.getElementById('input-nph').focus();
     }
 </script>
 

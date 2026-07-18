@@ -168,9 +168,8 @@
 
 <div class="container">
     <h2>Calculadora de Insulina</h2>
-    <p class="subtitle">Digite as doses (ex: 10+10+10). Pressione Enter para calcular e Enter novamente para mudar de linha.</p>
+    <p class="subtitle">Digite as doses. Pressione Enter para somar e Enter novamente para mudar de linha.</p>
 
-    <!-- Cabeçalho visível em computadores/tablets -->
     <div class="calc-header">
         <div>Tipo</div>
         <div>Doses (ex: 10+5+20)</div>
@@ -183,7 +182,8 @@
         <div class="label-insulina">NPH</div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
+            <!-- enterkeyhint="next" otimiza o teclado do celular para avançar -->
+            <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
         </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
@@ -200,7 +200,7 @@
         <div class="label-insulina">Regular</div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" onkeydown="gerenciarEnter(event, 'reg', null)">
+            <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
         </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
@@ -218,8 +218,8 @@
 </div>
 
 <script>
-    // Armazena o estado para saber se o valor mudou desde o último cálculo
-    const ultimosValores = { nph: "", reg: "" };
+    // Contador interno para controlar os cliques de "Enter" de forma isolada e robusta
+    let cliquesEnter = { nph: 0, reg: 0 };
 
     function ajustarLabelsMoveis() {
         const labels = document.querySelectorAll('.show-mobile-only');
@@ -232,24 +232,29 @@
     window.addEventListener('resize', ajustarLabelsMoveis);
     window.addEventListener('DOMContentLoaded', ajustarLabelsMoveis);
 
+    // Zera os cliques se o usuário começar a digitar de novo
+    document.getElementById('input-nph').addEventListener('input', () => cliquesEnter.nph = 0);
+    document.getElementById('input-reg').addEventListener('input', () => cliquesEnter.reg = 0);
+
     function gerenciarEnter(event, tipoAtual, proximoTipo) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Evita comportamentos indesejados do form
+            event.preventDefault(); // Impede recarregamento e comportamentos nativos
             
-            const inputElement = document.getElementById(`input-${tipoAtual}`);
-            const valorAtual = inputElement.value.trim();
+            cliquesEnter[tipoAtual]++;
 
-            // Se o valor na caixa mudou em relação ao que foi calculado por último, calcula primeiro
-            if (valorAtual !== ultimosValores[tipoAtual]) {
+            if (cliquesEnter[tipoAtual] === 1) {
+                // Primeiro Enter: Apenas calcula os valores na tela
                 calcularLinha(tipoAtual);
-                ultimosValores[tipoAtual] = valorAtual;
-            } else {
-                // Se o valor já estava calculado e ele apertou Enter de novo, pula para a próxima linha
+            } else if (cliquesEnter[tipoAtual] >= 2) {
+                // Segundo Enter (ou mais): Passa para o próximo passo
+                cliquesEnter[tipoAtual] = 0; // reseta o contador desta linha
+                
                 if (proximoTipo) {
-                    document.getElementById(`input-${proximoTipo}`).focus();
+                    const proxInput = document.getElementById(`input-${proximoTipo}`);
+                    proxInput.focus();
+                    proxInput.select(); // já seleciona o texto caso exista algum para facilitar a troca
                 } else {
-                    // Se for a última linha (Regular), tira o foco para fechar o teclado do celular
-                    inputElement.blur();
+                    document.getElementById(`input-${tipoAtual}`).blur(); // fecha teclado no celular ao terminar
                 }
             }
         }
@@ -284,27 +289,22 @@
         }
 
         const canetas = obterQuantidadeCanetas(soma);
-
         totalField.value = `${soma} UI`;
         canetasField.value = `${canetas} caneta${canetas !== 1 ? 's' : ''}`;
     }
 
     function limparTudo() {
-        // Limpa os inputs de texto
         document.getElementById('input-nph').value = "";
         document.getElementById('input-reg').value = "";
         
-        // Zera as saídas de texto
         document.getElementById('total-nph').value = "0 UI";
         document.getElementById('canetas-nph').value = "0";
         document.getElementById('total-reg').value = "0 UI";
         document.getElementById('canetas-reg').value = "0";
 
-        // Limpa o histórico de verificação do Enter
-        ultimosValores.nph = "";
-        ultimosValores.reg = "";
+        cliquesEnter.nph = 0;
+        cliquesEnter.reg = 0;
 
-        // Devolve o foco para o primeiro campo (NPH) para agilizar o próximo uso
         document.getElementById('input-nph').focus();
     }
 </script>

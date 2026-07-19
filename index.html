@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Canetas de Insulina</title>
+    <title>Calculadora de Carpules de Insulina</title>
     <style>
         :root {
             --bg-page: #f0f2f5;
@@ -155,22 +155,11 @@
         .nph .caixa-letra-lado { color: var(--nph-light-green); }
         .regular .caixa-letra-lado { color: var(--reg-light-orange); }
 
-        /* Tarja Vermelha de Sinalização Lateral */
+        /* Tarja Vermelha de Sinalização Lateral (Apenas Cor, Sem Texto) */
         .caixa-tarja-sinal {
             background-color: var(--tarja-vermelha);
             grid-column: 3;
             grid-row: 1 / span 2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            color: white;
-            font-size: 0.65rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-align: center;
-            padding: 5px 0;
             box-shadow: inset 5px 0 10px rgba(0,0,0,0.15);
         }
 
@@ -203,7 +192,7 @@
                 grid-template-columns: 1fr 45px;
             }
             .caixa-letra-lado {
-                display: none; /* Oculta a letra gigante no mobile para dar espaço */
+                display: none;
             }
             .caixa-inputs-grid {
                 grid-template-columns: 1fr;
@@ -211,7 +200,6 @@
             }
             .caixa-tarja-sinal {
                 grid-column: 2;
-                font-size: 0.55rem;
             }
             .caixa-insulina::before {
                 grid-column: 1 / span 1;
@@ -226,7 +214,7 @@
     <!-- EMBALAGEM NPH -->
     <div class="caixa-insulina nph">
         <div class="caixa-corpo">
-            <div class="caixa-brand">USLIN® N</div>
+            <div class="caixa-brand">INSULINA N</div>
             <h2 class="caixa-titulo">insulina humana - NPH</h2>
             <div class="caixa-inputs-grid">
                 <div class="group">
@@ -238,19 +226,19 @@
                     <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
                 </div>
                 <div class="group">
-                    <label>Canetas/Mês</label>
+                    <label>Carpules/Mês</label>
                     <input type="text" class="output-field" id="canetas-nph" readonly value="0">
                 </div>
             </div>
         </div>
         <div class="caixa-letra-lado">N</div>
-        <div class="caixa-tarja-sinal">USO SOB PRESCRIÇÃO MÉDICA</div>
+        <div class="caixa-tarja-sinal"></div>
     </div>
 
     <!-- EMBALAGEM REGULAR -->
     <div class="caixa-insulina regular">
         <div class="caixa-corpo">
-            <div class="caixa-brand">USLIN® R</div>
+            <div class="caixa-brand">INSULINA R</div>
             <h2 class="caixa-titulo">insulina humana - Regular</h2>
             <div class="caixa-inputs-grid">
                 <div class="group">
@@ -262,13 +250,13 @@
                     <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
                 </div>
                 <div class="group">
-                    <label>Canetas/Mês</label>
+                    <label>Carpules/Mês</label>
                     <input type="text" class="output-field" id="canetas-reg" readonly value="0">
                 </div>
             </div>
         </div>
         <div class="caixa-letra-lado">R</div>
-        <div class="caixa-tarja-sinal">USO SOB PRESCRIÇÃO MÉDICA</div>
+        <div class="caixa-tarja-sinal"></div>
     </div>
 
     <!-- BOTÃO LIMPAR -->
@@ -333,7 +321,7 @@
 
         const canetas = obterQuantidadeCanetas(soma);
         totalField.value = `${soma} UI`;
-        canetasField.value = `${canetas} caneta${canetas !== 1 ? 's' : ''}`;
+        canetasField.value = `${canetas} carpule${canetas !== 1 ? 'es' : ''}`;
     }
 
     function limparTudo() {

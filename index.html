@@ -6,26 +6,27 @@
     <title>Calculadora de Canetas de Insulina</title>
     <style>
         :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --primary: #007bff;
+            --card-bg: rgba(255, 255, 255, 0.92);
             --text-main: #333333;
-            --border-color: #cccccc;
-            --bg-readonly: rgba(255, 255, 255, 0.85);
-            --danger: #dc3545;
-            --danger-hover: #bd2130;
+            --border-color: rgba(0, 0, 0, 0.15);
+            --bg-readonly: rgba(255, 255, 255, 0.8);
             
-            /* Cores inspiradas nas embalagens */
-            --bg-nph: #69c3c2;
+            /* Novo Verde Esmeralda Forte */
+            --emerald: #00a86b;
+            --emerald-hover: #008f5a;
+            
+            /* Novas cores das linhas ajustadas */
+            --bg-nph: #94cccb;
             --letra-nph: #1c5655;
-            --bg-reg: #f4b07b;
+            --bg-reg: #f9c39a;
             --letra-reg: #d97930;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            /* Nova imagem de fundo centralizada e cobrindo toda a tela */
+            background: url("https://i.imgur.com/vjRX6iy.png") no-repeat center center fixed;
+            background-size: cover;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -40,22 +41,24 @@
             max-width: 700px;
             background: var(--card-bg);
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(4px); /* Leve efeito de vidro fosco */
         }
 
         h2 {
             text-align: center;
             margin-top: 0;
-            color: #222;
+            color: #111;
             margin-bottom: 5px;
         }
 
         p.subtitle {
             text-align: center;
-            color: #666;
+            color: #444;
             margin-bottom: 25px;
             font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .calc-header {
@@ -65,7 +68,7 @@
             font-weight: bold;
             margin-bottom: 8px;
             padding: 0 10px;
-            color: #555;
+            color: #444;
             font-size: 0.9rem;
         }
 
@@ -74,14 +77,14 @@
             grid-template-columns: 1.2fr 2fr 1.2fr 1.2fr;
             gap: 12px;
             align-items: center;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 8px;
             padding: 12px 10px;
             margin-bottom: 16px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        /* Estilização específica de cada linha */
+        /* Cores atualizadas das linhas */
         .row-nph {
             background-color: var(--bg-nph);
             color: #0b2e2d;
@@ -133,12 +136,12 @@
             background-color: var(--bg-readonly);
             text-align: center;
             font-weight: bold;
-            color: #222;
+            color: #111;
             border-color: rgba(0,0,0,0.1);
         }
 
         .output-canetas {
-            color: #155724 !important; /* Verde escuro para melhor contraste */
+            color: #0b5125 !important;
         }
 
         .actions {
@@ -147,23 +150,29 @@
             margin-top: 15px;
         }
 
+        /* Botão Verde Esmeralda Forte */
         .btn-clear {
-            background-color: var(--danger);
+            background-color: var(--emerald);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 0.95rem;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 6px rgba(0, 168, 107, 0.3);
         }
 
         .btn-clear:hover {
-            background-color: var(--danger-hover);
+            background-color: var(--emerald-hover);
         }
 
-        /* Responsividade para telas de celulares */
+        .btn-clear:active {
+            transform: scale(0.98);
+        }
+
+        /* Responsividade para celulares */
         @media (max-width: 600px) {
             .calc-header {
                 display: none;
@@ -194,7 +203,6 @@
             }
             .btn-clear {
                 width: 100%;
-                padding: 12px;
             }
         }
     </style>

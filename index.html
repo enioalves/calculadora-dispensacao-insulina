@@ -6,27 +6,31 @@
     <title>Calculadora de Canetas de Insulina</title>
     <style>
         :root {
-            --card-bg: rgba(255, 255, 255, 0.92);
-            --text-main: #333333;
-            --border-color: rgba(0, 0, 0, 0.15);
-            --bg-readonly: rgba(255, 255, 255, 0.8);
+            --bg-page: #f0f2f5;
+            --box-white: #ffffff;
+            --border-box: #e2e8f0;
+            --text-dark: #1a202c;
             
-            /* Novo Verde Esmeralda Forte */
+            /* Paleta da Embalagem NPH */
+            --nph-dark-green: #007a78;
+            --nph-light-green: #94cccb;
+            --nph-text: #004d4b;
+            
+            /* Paleta da Embalagem Regular */
+            --reg-orange: #f36e21;
+            --reg-light-orange: #f9c39a;
+            --reg-text: #c44d00;
+            
+            /* Tarja de Sinalização e Botão */
+            --tarja-vermelha: #cc0000;
             --emerald: #00a86b;
             --emerald-hover: #008f5a;
-            
-            /* Novas cores das linhas ajustadas */
-            --bg-nph: #94cccb;
-            --letra-nph: #1c5655;
-            --bg-reg: #f9c39a;
-            --letra-reg: #d97930;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Nova imagem de fundo centralizada e cobrindo toda a tela */
-            background: url("https://i.imgur.com/vjRX6iy.png") no-repeat center center fixed;
-            background-size: cover;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -38,171 +42,179 @@
 
         .container {
             width: 100%;
-            max-width: 700px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(4px); /* Leve efeito de vidro fosco */
+            max-width: 720px;
         }
 
-        h2 {
-            text-align: center;
-            margin-top: 0;
-            color: #111;
-            margin-bottom: 5px;
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: #444;
+        /* Estrutura simulando a caixa do remédio */
+        .caixa-insulina {
+            background-color: var(--box-white);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             margin-bottom: 25px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 120px 60px; /* Corpo, área do N/R, Tarja vermelha */
+            border: 1px solid var(--border-box);
         }
 
-        .calc-header {
-            display: grid;
-            grid-template-columns: 1.2fr 2fr 1.2fr 1.2fr;
-            gap: 12px;
+        /* Listras Superiores de Identificação */
+        .caixa-insulina.nph::before {
+            content: "";
+            grid-column: 1 / span 2;
+            height: 15px;
+            background-color: var(--nph-dark-green);
+        }
+        .caixa-insulina.regular::before {
+            content: "";
+            grid-column: 1 / span 2;
+            height: 15px;
+            background-color: var(--reg-orange);
+        }
+
+        /* Corpo do conteúdo interno */
+        .caixa-corpo {
+            padding: 20px;
+            grid-column: 1;
+        }
+
+        .caixa-brand {
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-bottom: 8px;
-            padding: 0 10px;
-            color: #444;
-            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
+        .nph .caixa-brand { color: var(--nph-text); }
+        .regular .caixa-brand { color: var(--reg-text); }
 
-        .calc-row {
+        .caixa-titulo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+        }
+        .nph .caixa-titulo { color: var(--nph-dark-green); }
+        .regular .caixa-titulo { color: var(--reg-orange); }
+
+        /* Inputs e Outputs internos */
+        .caixa-inputs-grid {
             display: grid;
-            grid-template-columns: 1.2fr 2fr 1.2fr 1.2fr;
+            grid-template-columns: 1.8fr 1fr 1fr;
             gap: 12px;
-            align-items: center;
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 8px;
-            padding: 12px 10px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        /* Cores atualizadas das linhas */
-        .row-nph {
-            background-color: var(--bg-nph);
-            color: #0b2e2d;
-        }
-
-        .row-reg {
-            background-color: var(--bg-reg);
-            color: #4a2304;
-        }
-
-        .label-container {
+        .group {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
         }
 
-        .letra-identificadora {
-            font-size: 2rem;
-            font-weight: 900;
-            line-height: 1;
-            font-family: Arial, sans-serif;
-        }
-
-        .nph-identificador { color: var(--letra-nph); }
-        .reg-identificador { color: var(--letra-reg); }
-
-        .label-insulina {
+        .group label {
+            font-size: 0.75rem;
             font-weight: bold;
-            font-size: 1.15rem;
+            color: #718096;
+            margin-bottom: 4px;
+            text-transform: uppercase;
         }
 
         input {
             width: 100%;
             padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
             font-size: 1rem;
             box-sizing: border-box;
+            font-weight: bold;
         }
 
         input.input-expressao {
-            text-align: left;
-            font-weight: 500;
             background-color: #ffffff;
-            border-color: rgba(0,0,0,0.15);
+            color: var(--text-dark);
+        }
+        input.input-expressao:focus {
+            outline: 2px solid #3182ce;
         }
 
         input.output-field {
-            background-color: var(--bg-readonly);
+            background-color: #f7fafc;
             text-align: center;
+            border-color: #e2e8f0;
+        }
+        .nph input.output-field { color: var(--nph-text); }
+        .regular input.output-field { color: var(--reg-text); }
+
+        /* Coluna da Letra Gigante (N ou R) */
+        .caixa-letra-lado {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--box-white);
+            font-size: 5rem;
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+        .nph .caixa-letra-lado { color: var(--nph-light-green); }
+        .regular .caixa-letra-lado { color: var(--reg-light-orange); }
+
+        /* Tarja Vermelha de Sinalização Lateral */
+        .caixa-tarja-sinal {
+            background-color: var(--tarja-vermelha);
+            grid-column: 3;
+            grid-row: 1 / span 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            color: white;
+            font-size: 0.65rem;
             font-weight: bold;
-            color: #111;
-            border-color: rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 5px 0;
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.15);
         }
 
-        .output-canetas {
-            color: #0b5125 !important;
-        }
-
+        /* Rodapé de Ações */
         .actions {
             display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        /* Botão Verde Esmeralda Forte */
         .btn-clear {
             background-color: var(--emerald);
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 0.95rem;
+            padding: 14px 40px;
+            font-size: 1rem;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 2px 6px rgba(0, 168, 107, 0.3);
+            transition: background 0.2s;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 168, 107, 0.2);
         }
 
-        .btn-clear:hover {
-            background-color: var(--emerald-hover);
-        }
+        .btn-clear:hover { background-color: var(--emerald-hover); }
 
-        .btn-clear:active {
-            transform: scale(0.98);
-        }
-
-        /* Responsividade para celulares */
-        @media (max-width: 600px) {
-            .calc-header {
-                display: none;
+        /* Responsividade para Mobile */
+        @media (max-width: 640px) {
+            .caixa-insulina {
+                grid-template-columns: 1fr 45px;
             }
-            .calc-row {
+            .caixa-letra-lado {
+                display: none; /* Oculta a letra gigante no mobile para dar espaço */
+            }
+            .caixa-inputs-grid {
                 grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 15px;
+                gap: 10px;
             }
-            .label-container {
-                border-bottom: 2px solid rgba(0,0,0,0.1);
-                padding-bottom: 6px;
-                margin-bottom: 4px;
+            .caixa-tarja-sinal {
+                grid-column: 2;
+                font-size: 0.55rem;
             }
-            .input-group-mobile {
-                display: flex;
-                flex-direction: column;
-            }
-            .input-group-mobile label {
-                font-size: 0.8rem;
-                margin-bottom: 3px;
-                font-weight: bold;
-                color: inherit;
-                opacity: 0.9;
-            }
-            .actions {
-                justify-content: center;
-            }
-            .btn-clear {
-                width: 100%;
+            .caixa-insulina::before {
+                grid-column: 1 / span 1;
             }
         }
     </style>
@@ -210,74 +222,63 @@
 <body>
 
 <div class="container">
-    <h2>Calculadora de Insulina</h2>
-    <p class="subtitle">Digite as doses. Pressione Enter para somar e Enter novamente para mudar de linha.</p>
 
-    <div class="calc-header">
-        <div>Tipo</div>
-        <div>Doses (ex: 10+5+20)</div>
-        <div style="text-align: center;">Total Diário</div>
-        <div style="text-align: center;">Canetas/Mês</div>
+    <!-- EMBALAGEM NPH -->
+    <div class="caixa-insulina nph">
+        <div class="caixa-corpo">
+            <div class="caixa-brand">USLIN® N</div>
+            <h2 class="caixa-titulo">insulina humana - NPH</h2>
+            <div class="caixa-inputs-grid">
+                <div class="group">
+                    <label>Doses Diárias</label>
+                    <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
+                </div>
+                <div class="group">
+                    <label>Total Diário</label>
+                    <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
+                </div>
+                <div class="group">
+                    <label>Canetas/Mês</label>
+                    <input type="text" class="output-field" id="canetas-nph" readonly value="0">
+                </div>
+            </div>
+        </div>
+        <div class="caixa-letra-lado">N</div>
+        <div class="caixa-tarja-sinal">USO SOB PRESCRIÇÃO MÉDICA</div>
     </div>
 
-    <!-- Linha NPH -->
-    <div class="calc-row row-nph">
-        <div class="label-container">
-            <span class="letra-identificadora nph-identificador">N</span>
-            <span class="label-insulina">NPH</span>
+    <!-- EMBALAGEM REGULAR -->
+    <div class="caixa-insulina regular">
+        <div class="caixa-corpo">
+            <div class="caixa-brand">USLIN® R</div>
+            <h2 class="caixa-titulo">insulina humana - Regular</h2>
+            <div class="caixa-inputs-grid">
+                <div class="group">
+                    <label>Doses Diárias</label>
+                    <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
+                </div>
+                <div class="group">
+                    <label>Total Diário</label>
+                    <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
+                </div>
+                <div class="group">
+                    <label>Canetas/Mês</label>
+                    <input type="text" class="output-field" id="canetas-reg" readonly value="0">
+                </div>
+            </div>
         </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
-        </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Total Diário:</label>
-            <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
-        </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Canetas/Mês:</label>
-            <input type="text" class="output-field output-canetas" id="canetas-nph" readonly value="0">
-        </div>
+        <div class="caixa-letra-lado">R</div>
+        <div class="caixa-tarja-sinal">USO SOB PRESCRIÇÃO MÉDICA</div>
     </div>
 
-    <!-- Linha Regular -->
-    <div class="calc-row row-reg">
-        <div class="label-container">
-            <span class="letra-identificadora reg-identificador">R</span>
-            <span class="label-insulina">Regular</span>
-        </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
-        </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Total Diário:</label>
-            <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
-        </div>
-        <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Canetas/Mês:</label>
-            <input type="text" class="output-field output-canetas" id="canetas-reg" readonly value="0">
-        </div>
-    </div>
-
+    <!-- BOTÃO LIMPAR -->
     <div class="actions">
-        <button class="btn-clear" onclick="limparTudo()">Limpar Campos</button>
+        <button class="btn-clear" onclick="limparTudo()">LIMPAR CAMPOS</button>
     </div>
 </div>
 
 <script>
     let cliquesEnter = { nph: 0, reg: 0 };
-
-    function ajustarLabelsMoveis() {
-        const labels = document.querySelectorAll('.show-mobile-only');
-        if (window.innerWidth <= 600) {
-            labels.forEach(l => l.style.display = 'block');
-        } else {
-            labels.forEach(l => l.style.display = 'none');
-        }
-    }
-    window.addEventListener('resize', ajustarLabelsMoveis);
-    window.addEventListener('DOMContentLoaded', ajustarLabelsMoveis);
 
     document.getElementById('input-nph').addEventListener('input', () => cliquesEnter.nph = 0);
     document.getElementById('input-reg').addEventListener('input', () => cliquesEnter.reg = 0);
@@ -285,14 +286,12 @@
     function gerenciarEnter(event, tipoAtual, proximoTipo) {
         if (event.key === 'Enter') {
             event.preventDefault();
-            
             cliquesEnter[tipoAtual]++;
 
             if (cliquesEnter[tipoAtual] === 1) {
                 calcularLinha(tipoAtual);
             } else if (cliquesEnter[tipoAtual] >= 2) {
                 cliquesEnter[tipoAtual] = 0;
-                
                 if (proximoTipo) {
                     const proxInput = document.getElementById(`input-${proximoTipo}`);
                     proxInput.focus();
@@ -340,7 +339,6 @@
     function limparTudo() {
         document.getElementById('input-nph').value = "";
         document.getElementById('input-reg').value = "";
-        
         document.getElementById('total-nph').value = "0 UI";
         document.getElementById('canetas-nph').value = "0";
         document.getElementById('total-reg').value = "0 UI";

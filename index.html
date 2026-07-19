@@ -11,9 +11,15 @@
             --primary: #007bff;
             --text-main: #333333;
             --border-color: #cccccc;
-            --bg-readonly: #e9ecef;
+            --bg-readonly: rgba(255, 255, 255, 0.85);
             --danger: #dc3545;
             --danger-hover: #bd2130;
+            
+            /* Cores inspiradas nas embalagens */
+            --bg-nph: #69c3c2;
+            --letra-nph: #1c5655;
+            --bg-reg: #f4b07b;
+            --letra-reg: #d97930;
         }
 
         body {
@@ -68,17 +74,43 @@
             grid-template-columns: 1.2fr 2fr 1.2fr 1.2fr;
             gap: 12px;
             align-items: center;
-            background: #fafafa;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(0,0,0,0.1);
             border-radius: 8px;
             padding: 12px 10px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+
+        /* Estilização específica de cada linha */
+        .row-nph {
+            background-color: var(--bg-nph);
+            color: #0b2e2d;
+        }
+
+        .row-reg {
+            background-color: var(--bg-reg);
+            color: #4a2304;
+        }
+
+        .label-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .letra-identificadora {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+            font-family: Arial, sans-serif;
+        }
+
+        .nph-identificador { color: var(--letra-nph); }
+        .reg-identificador { color: var(--letra-reg); }
 
         .label-insulina {
             font-weight: bold;
-            font-size: 1.1rem;
-            color: #222;
+            font-size: 1.15rem;
         }
 
         input {
@@ -93,18 +125,20 @@
         input.input-expressao {
             text-align: left;
             font-weight: 500;
+            background-color: #ffffff;
+            border-color: rgba(0,0,0,0.15);
         }
 
         input.output-field {
             background-color: var(--bg-readonly);
             text-align: center;
             font-weight: bold;
-            color: #333;
-            border-color: #ddd;
+            color: #222;
+            border-color: rgba(0,0,0,0.1);
         }
 
         .output-canetas {
-            color: #28a745 !important;
+            color: #155724 !important; /* Verde escuro para melhor contraste */
         }
 
         .actions {
@@ -139,9 +173,9 @@
                 gap: 8px;
                 padding: 15px;
             }
-            .label-insulina {
-                border-bottom: 2px solid var(--primary);
-                padding-bottom: 4px;
+            .label-container {
+                border-bottom: 2px solid rgba(0,0,0,0.1);
+                padding-bottom: 6px;
                 margin-bottom: 4px;
             }
             .input-group-mobile {
@@ -150,9 +184,10 @@
             }
             .input-group-mobile label {
                 font-size: 0.8rem;
-                color: #666;
                 margin-bottom: 3px;
                 font-weight: bold;
+                color: inherit;
+                opacity: 0.9;
             }
             .actions {
                 justify-content: center;
@@ -178,15 +213,17 @@
     </div>
 
     <!-- Linha NPH -->
-    <div class="calc-row">
-        <div class="label-insulina">NPH</div>
+    <div class="calc-row row-nph">
+        <div class="label-container">
+            <span class="letra-identificadora nph-identificador">N</span>
+            <span class="label-insulina">NPH</span>
+        </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
-            <!-- enterkeyhint="next" otimiza o teclado do celular para avançar -->
             <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
         </div>
         <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
+            <label class="show-mobile-only" style="display:none;">Total Diário:</label>
             <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
         </div>
         <div class="input-group-mobile">
@@ -196,14 +233,17 @@
     </div>
 
     <!-- Linha Regular -->
-    <div class="calc-row">
-        <div class="label-insulina">Regular</div>
+    <div class="calc-row row-reg">
+        <div class="label-container">
+            <span class="letra-identificadora reg-identificador">R</span>
+            <span class="label-insulina">Regular</span>
+        </div>
         <div class="input-group-mobile">
             <label class="show-mobile-only" style="display:none;">Doses:</label>
             <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
         </div>
         <div class="input-group-mobile">
-            <label class="show-mobile-only" style="display:none;">Total Diário (UI):</label>
+            <label class="show-mobile-only" style="display:none;">Total Diário:</label>
             <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
         </div>
         <div class="input-group-mobile">
@@ -218,7 +258,6 @@
 </div>
 
 <script>
-    // Contador interno para controlar os cliques de "Enter" de forma isolada e robusta
     let cliquesEnter = { nph: 0, reg: 0 };
 
     function ajustarLabelsMoveis() {
@@ -232,29 +271,26 @@
     window.addEventListener('resize', ajustarLabelsMoveis);
     window.addEventListener('DOMContentLoaded', ajustarLabelsMoveis);
 
-    // Zera os cliques se o usuário começar a digitar de novo
     document.getElementById('input-nph').addEventListener('input', () => cliquesEnter.nph = 0);
     document.getElementById('input-reg').addEventListener('input', () => cliquesEnter.reg = 0);
 
     function gerenciarEnter(event, tipoAtual, proximoTipo) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Impede recarregamento e comportamentos nativos
+            event.preventDefault();
             
             cliquesEnter[tipoAtual]++;
 
             if (cliquesEnter[tipoAtual] === 1) {
-                // Primeiro Enter: Apenas calcula os valores na tela
                 calcularLinha(tipoAtual);
             } else if (cliquesEnter[tipoAtual] >= 2) {
-                // Segundo Enter (ou mais): Passa para o próximo passo
-                cliquesEnter[tipoAtual] = 0; // reseta o contador desta linha
+                cliquesEnter[tipoAtual] = 0;
                 
                 if (proximoTipo) {
                     const proxInput = document.getElementById(`input-${proximoTipo}`);
                     proxInput.focus();
-                    proxInput.select(); // já seleciona o texto caso exista algum para facilitar a troca
+                    proxInput.select();
                 } else {
-                    document.getElementById(`input-${tipoAtual}`).blur(); // fecha teclado no celular ao terminar
+                    document.getElementById(`input-${tipoAtual}`).blur();
                 }
             }
         }

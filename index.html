@@ -28,8 +28,7 @@
 
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
-            /* Degradê sutil em tons de cinza */
-            background: radial-gradient(circle, #f7fafc 0%, #cbd5e0 100%);
+            background: linear-gradient(to bottom, #b8c2cc 0%, #718096 100%);
             color: var(--text-dark);
             margin: 0;
             padding: 20px;
@@ -45,13 +44,16 @@
             max-width: 720px;
         }
 
-        /* Painel de fundo que une todo o sistema */
+        /* Painel de fundo com super sombra projetada */
         .calc-wrapper {
             background: #ffffff;
             padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.25), 
+                0 15px 15px rgba(0, 0, 0, 0.18),
+                0 0 100px rgba(0, 0, 0, 0.1);
         }
 
         /* Estrutura simulando a caixa do remédio */
@@ -168,7 +170,7 @@
         .nph .caixa-letra-lado { color: var(--nph-light-green); }
         .regular .caixa-letra-lado { color: var(--reg-light-orange); }
 
-        /* Tarja Vermelha com Simulação de Linhas de Texto */
+        /* Tarja Vermelha Dinâmica */
         .caixa-tarja-sinal {
             background-color: var(--tarja-vermelha);
             grid-column: 3;
@@ -178,19 +180,27 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            padding: 15px 0;
+            gap: 4px;
+            padding: 10px 4px;
         }
 
-        /* Elementos que simulam o texto na tarja */
+        /* Novas Linhas Simuladas: Mais finas, variadas e abundantes */
         .linha-simulada {
             background-color: rgba(255, 255, 255, 0.75);
-            height: 3px;
-            border-radius: 2px;
+            height: 2px; /* Mais fina */
+            border-radius: 1px;
         }
-        .linha-simulada.longa { width: 35px; }
-        .linha-simulada.curta { width: 20px; }
-        .espaco-simulado { height: 6px; }
+        
+        /* Variações de Largura */
+        .w-total { width: 42px; }
+        .w-longa { width: 34px; }
+        .w-media { width: 26px; }
+        .w-curta { width: 16px; }
+        
+        /* Espaçamentos Variados */
+        .espaco-p { height: 2px; }
+        .espaco-m { height: 6px; }
+        .espaco-g { height: 10px; }
 
         /* Rodapé de Ações Ajustado */
         .actions {
@@ -221,6 +231,7 @@
         @media (max-width: 640px) {
             .calc-wrapper {
                 padding: 15px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             }
             .caixa-insulina {
                 grid-template-columns: 1fr 45px;
@@ -234,7 +245,13 @@
             }
             .caixa-tarja-sinal {
                 grid-column: 2;
+                gap: 3px;
+                padding: 10px 2px;
             }
+            .w-total { width: 30px; }
+            .w-longa { width: 24px; }
+            .w-media { width: 18px; }
+            .w-curta { width: 12px; }
             .caixa-insulina::before {
                 grid-column: 1 / span 1;
             }
@@ -276,12 +293,26 @@
             </div>
             <div class="caixa-letra-lado">N</div>
             <div class="caixa-tarja-sinal">
-                <div class="linha-simulada longa"></div>
-                <div class="espaco-simulado"></div>
-                <div class="linha-simulada curta"></div>
-                <div class="linha-simulada curta"></div>
-                <div class="espaco-simulado"></div>
-                <div class="linha-simulada longa"></div>
+                <!-- Bloco 1: Título Simulado -->
+                <div class="linha-simulada w-media"></div>
+                <div class="espaco-p"></div>
+                <div class="linha-simulada w-longa"></div>
+                
+                <div class="espaco-m"></div>
+                
+                <!-- Bloco 2: Parágrafo Simulado -->
+                <div class="linha-simulada w-total"></div>
+                <div class="linha-simulada w-longa"></div>
+                <div class="linha-simulada w-total"></div>
+                <div class="linha-simulada w-media"></div>
+                <div class="linha-simulada w-curta"></div>
+                
+                <div class="espaco-g"></div>
+                
+                <!-- Bloco 3: Informações de Rodapé Simuladas -->
+                <div class="linha-simulada w-longa"></div>
+                <div class="espaco-p"></div>
+                <div class="linha-simulada w-media"></div>
             </div>
         </div>
 
@@ -307,12 +338,26 @@
             </div>
             <div class="caixa-letra-lado">R</div>
             <div class="caixa-tarja-sinal">
-                <div class="linha-simulada longa"></div>
-                <div class="espaco-simulado"></div>
-                <div class="linha-simulada curta"></div>
-                <div class="linha-simulada curta"></div>
-                <div class="espaco-simulado"></div>
-                <div class="linha-simulada longa"></div>
+                <!-- Bloco 1: Título Simulado -->
+                <div class="linha-simulada w-media"></div>
+                <div class="espaco-p"></div>
+                <div class="linha-simulada w-longa"></div>
+                
+                <div class="espaco-m"></div>
+                
+                <!-- Bloco 2: Parágrafo Simulado -->
+                <div class="linha-simulada w-total"></div>
+                <div class="linha-simulada w-longa"></div>
+                <div class="linha-simulada w-total"></div>
+                <div class="linha-simulada w-media"></div>
+                <div class="linha-simulada w-curta"></div>
+                
+                <div class="espaco-g"></div>
+                
+                <!-- Bloco 3: Informações de Rodapé Simuladas -->
+                <div class="linha-simulada w-longa"></div>
+                <div class="espaco-p"></div>
+                <div class="linha-simulada w-media"></div>
             </div>
         </div>
 

@@ -6,7 +6,6 @@
     <title>Calculadora de Carpules de Insulina</title>
     <style>
         :root {
-            --bg-page: #f0f2f5;
             --box-white: #ffffff;
             --border-box: #e2e8f0;
             --text-dark: #1a202c;
@@ -29,7 +28,8 @@
 
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-page);
+            /* Degradê sutil em tons de cinza */
+            background: radial-gradient(circle, #f7fafc 0%, #cbd5e0 100%);
             color: var(--text-dark);
             margin: 0;
             padding: 20px;
@@ -45,17 +45,30 @@
             max-width: 720px;
         }
 
+        /* Painel de fundo que une todo o sistema */
+        .calc-wrapper {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
         /* Estrutura simulando a caixa do remédio */
         .caixa-insulina {
             background-color: var(--box-white);
             border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
             position: relative;
             overflow: hidden;
             display: grid;
             grid-template-columns: 1fr 120px 60px; /* Corpo, área do N/R, Tarja vermelha */
             border: 1px solid var(--border-box);
+            margin-bottom: 6px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .caixa-insulina:last-of-type {
+            margin-bottom: 20px;
         }
 
         /* Listras Superiores de Identificação */
@@ -155,39 +168,60 @@
         .nph .caixa-letra-lado { color: var(--nph-light-green); }
         .regular .caixa-letra-lado { color: var(--reg-light-orange); }
 
-        /* Tarja Vermelha de Sinalização Lateral (Apenas Cor, Sem Texto) */
+        /* Tarja Vermelha com Simulação de Linhas de Texto */
         .caixa-tarja-sinal {
             background-color: var(--tarja-vermelha);
             grid-column: 3;
             grid-row: 1 / span 2;
             box-shadow: inset 5px 0 10px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 0;
         }
 
-        /* Rodapé de Ações */
+        /* Elementos que simulam o texto na tarja */
+        .linha-simulada {
+            background-color: rgba(255, 255, 255, 0.75);
+            height: 3px;
+            border-radius: 2px;
+        }
+        .linha-simulada.longa { width: 35px; }
+        .linha-simulada.curta { width: 20px; }
+        .espaco-simulado { height: 6px; }
+
+        /* Rodapé de Ações Ajustado */
         .actions {
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            justify-content: flex-end; 
+            padding-right: 2px;
         }
 
         .btn-clear {
             background-color: var(--emerald);
             color: white;
             border: none;
-            padding: 14px 40px;
-            font-size: 1rem;
+            padding: 10px 24px;
+            font-size: 0.9rem;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             transition: background 0.2s;
-            width: 100%;
-            box-shadow: 0 4px 6px rgba(0, 168, 107, 0.2);
+            width: 180px; 
+            box-shadow: 0 2px 4px rgba(0, 168, 107, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-clear:hover { background-color: var(--emerald-hover); }
 
         /* Responsividade para Mobile */
         @media (max-width: 640px) {
+            .calc-wrapper {
+                padding: 15px;
+            }
             .caixa-insulina {
                 grid-template-columns: 1fr 45px;
             }
@@ -204,64 +238,88 @@
             .caixa-insulina::before {
                 grid-column: 1 / span 1;
             }
+            .actions {
+                justify-content: center;
+                padding-right: 0;
+            }
+            .btn-clear {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    
+    <div class="calc-wrapper">
 
-    <!-- EMBALAGEM NPH -->
-    <div class="caixa-insulina nph">
-        <div class="caixa-corpo">
-            <div class="caixa-brand">INSULINA N</div>
-            <h2 class="caixa-titulo">insulina humana - NPH</h2>
-            <div class="caixa-inputs-grid">
-                <div class="group">
-                    <label>Doses Diárias</label>
-                    <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
-                </div>
-                <div class="group">
-                    <label>Total Diário</label>
-                    <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
-                </div>
-                <div class="group">
-                    <label>Carpules/Mês</label>
-                    <input type="text" class="output-field" id="canetas-nph" readonly value="0">
+        <!-- EMBALAGEM NPH -->
+        <div class="caixa-insulina nph">
+            <div class="caixa-corpo">
+                <div class="caixa-brand">INSULINA N</div>
+                <h2 class="caixa-titulo">insulina humana - NPH</h2>
+                <div class="caixa-inputs-grid">
+                    <div class="group">
+                        <label>Doses Diárias</label>
+                        <input type="text" class="input-expressao" id="input-nph" placeholder="Ex: 10+10+10" enterkeyhint="next" onkeydown="gerenciarEnter(event, 'nph', 'reg')">
+                    </div>
+                    <div class="group">
+                        <label>Total Diário</label>
+                        <input type="text" class="output-field" id="total-nph" readonly value="0 UI">
+                    </div>
+                    <div class="group">
+                        <label>Carpules/Mês</label>
+                        <input type="text" class="output-field" id="canetas-nph" readonly value="0">
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="caixa-letra-lado">N</div>
-        <div class="caixa-tarja-sinal"></div>
-    </div>
-
-    <!-- EMBALAGEM REGULAR -->
-    <div class="caixa-insulina regular">
-        <div class="caixa-corpo">
-            <div class="caixa-brand">INSULINA R</div>
-            <h2 class="caixa-titulo">insulina humana - Regular</h2>
-            <div class="caixa-inputs-grid">
-                <div class="group">
-                    <label>Doses Diárias</label>
-                    <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
-                </div>
-                <div class="group">
-                    <label>Total Diário</label>
-                    <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
-                </div>
-                <div class="group">
-                    <label>Carpules/Mês</label>
-                    <input type="text" class="output-field" id="canetas-reg" readonly value="0">
-                </div>
+            <div class="caixa-letra-lado">N</div>
+            <div class="caixa-tarja-sinal">
+                <div class="linha-simulada longa"></div>
+                <div class="espaco-simulado"></div>
+                <div class="linha-simulada curta"></div>
+                <div class="linha-simulada curta"></div>
+                <div class="espaco-simulado"></div>
+                <div class="linha-simulada longa"></div>
             </div>
         </div>
-        <div class="caixa-letra-lado">R</div>
-        <div class="caixa-tarja-sinal"></div>
-    </div>
 
-    <!-- BOTÃO LIMPAR -->
-    <div class="actions">
-        <button class="btn-clear" onclick="limparTudo()">LIMPAR CAMPOS</button>
+        <!-- EMBALAGEM REGULAR -->
+        <div class="caixa-insulina regular">
+            <div class="caixa-corpo">
+                <div class="caixa-brand">INSULINA R</div>
+                <h2 class="caixa-titulo">insulina humana - Regular</h2>
+                <div class="caixa-inputs-grid">
+                    <div class="group">
+                        <label>Doses Diárias</label>
+                        <input type="text" class="input-expressao" id="input-reg" placeholder="Ex: 5+5" enterkeyhint="done" onkeydown="gerenciarEnter(event, 'reg', null)">
+                    </div>
+                    <div class="group">
+                        <label>Total Diário</label>
+                        <input type="text" class="output-field" id="total-reg" readonly value="0 UI">
+                    </div>
+                    <div class="group">
+                        <label>Carpules/Mês</label>
+                        <input type="text" class="output-field" id="canetas-reg" readonly value="0">
+                    </div>
+                </div>
+            </div>
+            <div class="caixa-letra-lado">R</div>
+            <div class="caixa-tarja-sinal">
+                <div class="linha-simulada longa"></div>
+                <div class="espaco-simulado"></div>
+                <div class="linha-simulada curta"></div>
+                <div class="linha-simulada curta"></div>
+                <div class="espaco-simulado"></div>
+                <div class="linha-simulada longa"></div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-clear" onclick="limparTudo()">Limpar Campos</button>
+        </div>
+
     </div>
 </div>
 
